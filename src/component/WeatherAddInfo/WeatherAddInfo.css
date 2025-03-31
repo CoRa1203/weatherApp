@@ -1,0 +1,13 @@
+.weatherInfo_addInfo{
+    display: flex;
+    width: 100%;
+  justify-content: space-between;
+  padding: 1.5rem 2.25rem;
+  }
+  
+  .weatherInfo_addInfo-card{
+    text-align: center;
+  }
+  .weatherInfo_addInfo-card img{
+   margin-bottom: 0.5rem;
+  }
