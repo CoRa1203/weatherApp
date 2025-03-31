@@ -132,8 +132,8 @@ function App() {
   };
 
   useEffect(() => {
-    search("Izhevsk"); /*город по умолчанию*/
-  }, []);
+    
+  }, [search]);
 
   useEffect(() => {
     if (weatherData) {
