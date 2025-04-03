@@ -1,6 +1,6 @@
 import "./App.css";
 import loop from "./img/loop.svg";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback} from "react";
 import axios from "axios";
 import WeatherAddInfo from "./component/WeatherAddInfo/WeatherAddInfo";
 
@@ -16,18 +16,19 @@ function App() {
   const [error, setError] = useState(null);
   const [showSuggestions, setShowSuggestions] =
     useState(false); /*показывает подсказки*/
-
+    
   const inputRef = useRef(); /*создаем объект*/
   const APIKey = process.env.REACT_APP_API_KEY;
 
-  const search = async (cityName) => {
+  const search = useCallback(async (cityName) => {
     /*функция поиска погоды*/
     if (!cityName.trim()) {
       setError("Введите название города");
-
+    
       return;
     }
     try {
+       
       setLoading(true); /*отображение загрузки*/
       setError(null); /*сброс ошибки*/
 
@@ -66,13 +67,14 @@ function App() {
     } finally {
       setLoading(false); /*выключении индикатора загрузки*/
     }
-  };
+  },[APIKey]); /*функция обновится, если поменятеся APIKey*/
 
   const fetchCitySuggestions = async (hint) => {
     /*функция для отображения подсказок городов*/
+  
     if (hint.length < 2) {
-      /*отправляется запрос при условии, что введено больше 2 символов*/
-      setСityList([]); /*очищаем список подсказок*/
+      setСityList([]);
+      setShowSuggestions(false);
       return;
     }
     try {
@@ -86,12 +88,14 @@ function App() {
         }))
       );
       setShowSuggestions(true); /*показываем подсказки*/
+
     } catch (error) {
       console.error("Ошибка при получении подсказок:", error);
       setСityList([]); /*очищает список при возникновении ошибки*/
     }
   };
 
+  
   const getWeatherClassName = () => {
     if (!weatherData) return "sunny";
     const weatherClassInfo = weatherData.weather[0].main.toLowerCase();
@@ -114,42 +118,40 @@ function App() {
 
   const handleCitySelect = (selectedCity) => {
     /*функция для добавления нужного города в Input из подсказок*/
+ 
     setCity(selectedCity); /*Добавляем город в input*/
     search(selectedCity); /*поиск погоды по выбранному городу*/
     setShowSuggestions(false); /*скрываем подсказки*/
   };
 
   const handleSearchClick = () => {
+ 
     /*запускаем в работу поиск погоды при клике на кнопку поиска*/
     search(city); /*поиск погоды по текущему городу*/
   };
 
   const handleKeyDown = (e) => {
+
     /*запускаем в работу поиск погоды при клике на enter*/
     if (e.key === "Enter") {
       search(city); /*поиск при клике на enter*/
     }
   };
 
-  useEffect(() => {
-    
-  }, [search]);
+  useEffect(() => {}, [search]);
 
-  useEffect(() => {
-    if (weatherData) {
-      console.log("Current weather class:", getWeatherClassName());
-      console.log(
-        "Applied container classes:",
-        document.querySelector(".appContainer").className
-      );
-    }
-  }, [weatherData]);
+  // useEffect(() => {
+  //   if (weatherData) {
+  //     console.log("Current weather class:", getWeatherClassName());
+  //     console.log(
+  //       "Applied container classes:",
+  //       document.querySelector(".appContainer").className
+  //     );
+  //   }
+  // }, [weatherData]);
 
   return (
     <div className={`App ${getWeatherClassName()}`}>
-      <div className={`cloud1 cloud1Gen ${getWeatherClassName()}`} />
-      <div className={`cloud2 cloud1Gen ${getWeatherClassName()}`} />
-      <div className={`cloud3 cloud1Gen ${getWeatherClassName()}`} />
       <div className={`appContainer ${getWeatherClassName()}`}>
         <div className="searchСity">
           <input
@@ -182,6 +184,7 @@ function App() {
             </ul>
           )}
         </div>
+        {!weatherData && !loading && !error && <p className="defaultInfo">Введите город</p>}
         {loading && <div className="loading">Загрузка...</div>}
         {/* отображение индикатора загрузки */}
         {error && <div className="error">{error}</div>}
@@ -201,7 +204,6 @@ function App() {
               humidity={weatherData.humidity}
             />
           </div>
-          
         )}
       </div>
     </div>

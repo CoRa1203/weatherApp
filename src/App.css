@@ -77,6 +77,11 @@ button {
  z-index: 10;
 }
 
+.defaultInfo{
+  padding-top: 50%;
+  text-align: center;
+}
+
 h1{
   font-size: 1.5rem;
 }
